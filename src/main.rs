@@ -1,4 +1,4 @@
-mod bench;
+pub mod bench;
 use bench::*;
 use ma_titan::default::immutable::{Int, STree};
 use uint::*;
