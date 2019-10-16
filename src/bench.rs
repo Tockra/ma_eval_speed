@@ -22,7 +22,8 @@ const SEED: u128 = 0xcafef00dd15ea5e5;
 /// Diese Methode lädt die Testdaten aus ./testdata/{u40,u48,u64}/ und konstruiert mit Hilfe dieser eine
 /// Datenstruktur T. Dabei wird die Laufzeit gemessen.
 pub fn static_build_benchmark<E: Typable + From<u64> + Copy + Debug, T: PredecessorSetStatic<E>>(data: &str) {
-    println!("Starte Evaluierung der Datenstrukturerzeugung");
+    println!("Starte Laufzeitmessung new(). Datenstruktur: {}, Datentyp {}, Datensatz: {}", E::TYPE, T::TYPE, data);
+
     let bench_start = Instant::now();
     std::fs::create_dir_all("./output/new/").unwrap();
 
@@ -31,25 +32,26 @@ pub fn static_build_benchmark<E: Typable + From<u64> + Copy + Debug, T: Predeces
         .write(true)
         .truncate(true)
         .create(true)
-        .open(format!("output/new/{}.txt",T::TYPE)).unwrap());
+        .open(format!("output/new/{}_{}.txt",T::TYPE,data.replace("/", "_"))).unwrap());
     
     for dir in read_dir(format!("testdata/{}/{}/",data, E::TYPE)).unwrap() {
-        let dir = dir.unwrap();
-        let path = dir.path();
+        let path = dir.unwrap().path();
+        if path.to_str().unwrap().contains("git") {
+            continue;
+        }
         println!("{:?}",path);
         
         let values = read_from_file::<E>(path.to_str().unwrap()).unwrap();
-      
 
+        let len = values.len();
+        let now = Instant::now();
         for _ in 0..SAMPLE_SIZE {
-            let values_cloned = values.clone();
-            let len = values_cloned.len();
-            let now = Instant::now();
-            let result_ds = T::new(values_cloned);
-            let elapsed_time = now.elapsed().as_nanos();
-            writeln!(result, "RESULT algo={} method=new size={} time={} unit=ns repeats={}",T::TYPE, len, elapsed_time, SAMPLE_SIZE).unwrap(); 
+            let result_ds = T::new(values.clone());
             ::std::mem::size_of_val(&result_ds);
         }
+        let elapsed_time = now.elapsed().as_nanos();
+        writeln!(result, "RESULT algo={} method=new size={} time={} unit=ns repeats={}",T::TYPE, len, elapsed_time, SAMPLE_SIZE).unwrap(); 
+          
         result.flush().unwrap();
         
     }
@@ -61,8 +63,7 @@ pub fn create_output() {
     std::fs::create_dir_all("input/pred/uniform/u40/").unwrap();
    
     for dir in read_dir(format!("testdata/normal/bereich_komplett/u40/")).unwrap() {
-        let dir = dir.unwrap();
-        let path = dir.path();
+        let path = dir.unwrap().path();
         println!("{:?}",path);
         
         let values = read_from_file::<uint::u40>(path.to_str().unwrap()).unwrap();
@@ -80,48 +81,61 @@ pub fn create_output() {
 /// Anschließend werden 10000 gültige Vor- bzw. Nachfolger erzeugt und die Laufzeiten der Predecessor-Methode 
 /// werden mit Hilfe dieser gemessen
 pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64> + Into<u64>, T: Clone + PredecessorSetStatic<E>>(data: &str) {
-    println!("Starte Evaluierung der Predecessor- und Successor Methoden.");
+    println!("Starte Laufzeitmessung pred(). Datenstruktur: {}, Datentyp {}, Datensatz: {}", E::TYPE, T::TYPE, data);
     let bench_start = Instant::now();
-    std::fs::create_dir_all("./output/pred/{}.txt").unwrap();
+    std::fs::create_dir_all("./output/pred/").unwrap();
     let mut result = BufWriter::new(OpenOptions::new()
         .read(true)
         .write(true)
         .truncate(true)
         .create(true)
-        .open(format!("output/pred/{}.txt",T::TYPE)).unwrap());
+        .open(format!("output/pred/{}_{}.txt",T::TYPE,data.replace("/", "_"))).unwrap());
     for dir in read_dir(format!("testdata/{}/{}/",data, E::TYPE)).unwrap() {
-        let dir = dir.unwrap();
-        let path = dir.path();
+        let path = dir.unwrap().path();
+        if path.to_str().unwrap().contains("git") {
+            continue;
+        }
         println!("{:?}",path);
 
         let values = read_from_file::<E>(path.to_str().unwrap()).unwrap();
-        let values_len = values.len();
+        let size = values.len();
+        println!("Test-Elemente eingelesen");
+        let test_values = read_from_file::<E>(&format!("input/pred/uniform/u40/min{}_max{}.data",values[0].into(),values[size-1].into())).unwrap();
+        println!("Test-Values eingelesen");
+        let repeats = test_values.len();
 
-        let test_values = read_from_file::<E>(&format!("input/pred/uniform/u40/min{}_max{}.data",values[0].into(),values[values_len-1].into())).unwrap();
-
-        let len = values.len();
+        println!("Starte evaluierung pred()");
         let data_structure = T::new(values.clone());
-        let data_structure_succ = T::new(values);
         
-
-        for _ in 0..SAMPLE_SIZE {
+        println!("Datenstruktur erstellt");
+        for i in 0..SAMPLE_SIZE {
             cache_clear();
             let now = Instant::now();
             for elem in test_values.iter() {
                 data_structure.predecessor(*elem);
             }
             let elapsed_time = now.elapsed().as_nanos();
-            writeln!(result, "RESULT algo={} method=predecessor size={} time={} unit=ns repeats={} data={}",T::TYPE, len, elapsed_time, SAMPLE_SIZE,values_len).unwrap();
+            if i % 10 == 0 {
+                println!("Fortschritt: {}%",i*100/SAMPLE_SIZE);
+            }
+            writeln!(result, "RESULT algo={} method=predecessor size={} time={} unit=ns repeats={}",T::TYPE, size*std::mem::size_of::<E>(), elapsed_time, repeats).unwrap();
         }
 
-        for _ in 0..SAMPLE_SIZE {
+        println!("Starte evaluierung succ()");
+        let data_structure_succ = T::new(values);
+        println!("Datenstruktur erstellt");
+
+        for i in 0..SAMPLE_SIZE {
             cache_clear();
             let now = Instant::now();
             for elem in test_values.iter() {
                 data_structure_succ.successor(*elem);
             }
             let elapsed_time = now.elapsed().as_nanos();
-            writeln!(result, "RESULT algo={} method=successor size={} time={} unit=ns repeats={} data={}",T::TYPE, len, elapsed_time, SAMPLE_SIZE,values_len).unwrap();
+            if i % 10 == 0 {
+                println!("Fortschritt: {}%",i*100/SAMPLE_SIZE);
+            }
+            writeln!(result, "RESULT algo={} method=successor size={} time={} unit=ns repeats={}",T::TYPE, size*std::mem::size_of::<E>(), elapsed_time, repeats).unwrap();
         }
         result.flush().unwrap();
     }
@@ -142,13 +156,10 @@ fn get_test_values<E: 'static + Typable + Copy + From<u64> + Into<u64> + Add<u32
 pub fn cache_clear() {
     std::fs::create_dir_all("./cache").unwrap();
 
-    let mut data = vec![23u64];
+    let mut data = vec![0u64, 2u64];
 
-    for i in 1 .. 3_750_000u64 {
-        let mut sum = 0;
-        for j in 0..(i as usize) {
-            sum += data[j];
-        }
+    for i in 2 .. 3_750_000u64 {
+        let sum = data[(i-1) as usize]*2+3+data[(i-2) as usize]*2+3;
         data.push(black_box(sum));
     }
 
@@ -167,7 +178,7 @@ impl<T: Int> PredecessorSetStatic<T> for VEBTree {
     const TYPE: &'static str = "vEB-Tree";
 
     fn new(elements: Box<[T]>) -> Self {
-        let mut vtree = vs::with_capacity(elements.len());
+        let mut vtree = vs::with_capacity((elements[elements.len()-1]).into() as usize);
         for &elem in elements.iter() {
             vtree.insert((elem.into()) as usize);
         }
@@ -257,7 +268,7 @@ impl<T: Int> BinarySearch<T> {
             return None;
         }
 
-        while r != l && element >= self.element_list[l]  {
+        while r != l && element > self.element_list[l]  {
             let m = (l+r)/2;
             if element >= self.element_list[m] {
                 l = m+1;
@@ -265,7 +276,7 @@ impl<T: Int> BinarySearch<T> {
                 r = m;
             }
         }
-        if element < self.element_list[l] {
+        if element <= self.element_list[l] {
             Some(self.element_list[l])
         } else {
             None
@@ -278,18 +289,18 @@ impl<T: Int> BinarySearch<T> {
 
         if element <= self.element_list[l] {
             return None;
-        }
+        } 
 
-        while l != r && element <= self.element_list[r] {
+        while l != r && element < self.element_list[r] {
             let m = (l+r)/2;
-            if self.element_list[m] >= element {
-                r = m-1;
+            if self.element_list[m] < element {
+                l = m+1;
             } else {
-                l = m;
+                r = m;
             }
         }
 
-        if element > self.element_list[r] {
+        if element >= self.element_list[r] {
             Some(self.element_list[r])
         } else {
             None
