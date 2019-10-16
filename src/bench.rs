@@ -97,6 +97,7 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
         }
         println!("{:?}",path);
 
+        {
         let values = read_from_file::<E>(path.to_str().unwrap()).unwrap();
         let size = values.len();
         println!("Test-Elemente eingelesen");
@@ -105,7 +106,7 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
         let repeats = test_values.len();
 
         println!("Starte evaluierung pred()");
-        let data_structure = T::new(values.clone());
+        let data_structure = T::new(values);
         
         println!("Datenstruktur erstellt");
         for i in 0..SAMPLE_SIZE {
@@ -119,24 +120,32 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
                 println!("Fortschritt: {}%",i*100/SAMPLE_SIZE);
             }
             writeln!(result, "RESULT algo={} method=predecessor size={} time={} unit=ns repeats={}",T::TYPE, size*std::mem::size_of::<E>(), elapsed_time, repeats).unwrap();
-        }
+        }}
+        {
+        let values = read_from_file::<E>(path.to_str().unwrap()).unwrap();
+        let size = values.len();
+        println!("Test-Elemente eingelesen");
+        let test_values = read_from_file::<E>(&format!("input/pred/uniform/u40/min{}_max{}.data",values[0].into(),values[size-1].into())).unwrap();
+        println!("Test-Values eingelesen");
+        let repeats = test_values.len();
 
-        println!("Starte evaluierung succ()");
-        let data_structure_succ = T::new(values);
+        println!("Starte evaluierung pred()");
+        let data_structure = T::new(values);
+        
         println!("Datenstruktur erstellt");
 
         for i in 0..SAMPLE_SIZE {
             cache_clear();
             let now = Instant::now();
             for elem in test_values.iter() {
-                data_structure_succ.successor(*elem);
+                data_structure.successor(*elem);
             }
             let elapsed_time = now.elapsed().as_nanos();
             if i % 10 == 0 {
                 println!("Fortschritt: {}%",i*100/SAMPLE_SIZE);
             }
             writeln!(result, "RESULT algo={} method=successor size={} time={} unit=ns repeats={}",T::TYPE, size*std::mem::size_of::<E>(), elapsed_time, repeats).unwrap();
-        }
+        }}
         result.flush().unwrap();
     }
     println!("Laufzeitmessung der Predecessor- und Successor-Methoden beendet. Dauer {} Sekunden", bench_start.elapsed().as_secs())
