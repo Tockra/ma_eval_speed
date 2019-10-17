@@ -13,12 +13,12 @@ fn main() {
 	let args: Vec<String> = std::env::args().collect();
 
     if args.len() != 5 {
-        println!("Bitte verwende {} <stree|vebtree|btree|binary> <pred|new> <u40|u48|u64> <uniform|normal/bereich_viertel|normal/bereich_komplett|bwt_runs>",args[0]);
+        println!("Bitte verwende {} <stree|vebtree|btree|binary> <pred|new> <u40|u48|u64> <uniform|normal|bwt_runs>",args[0]);
         return;
     }
 	
-    if args[4] != "uniform" && args[4] != "normal/bereich_viertel" && args[4] != "normal/bereich_komplett" && args[4] != "bwt_runs" {
-        println!("Bitte verwende {} <stree|vebtree|btree|binary> <pred|new> <u40|u48|u64> <uniform|normal/bereich_viertel|normal/bereich_komplett|bwt_runs>",args[0]);
+    if args[4] != "uniform" && args[4] != "normal" && args[4] != "bwt_runs" {
+        println!("Bitte verwende {} <stree|vebtree|btree|binary> <pred|new> <u40|u48|u64> <uniform|normal|bwt_runs>",args[0]);
         return;
     } 
 
@@ -26,7 +26,7 @@ fn main() {
 		"u40" => stage1::<u40>(args),
 		"u48" => stage1::<u48>(args),
 		"u64" => stage1::<u64>(args),
-		_ => println!("Bitte verwende {} <stree|vebtree|btree|binary> <pred|new> <u40|u48|u64> <uniform|normal/bereich_viertel|normal/bereich_komplett|bwt_runs>",args[0]),
+		_ => println!("Bitte verwende {} <stree|vebtree|btree|binary> <pred|new> <u40|u48|u64> <uniform|normal|bwt_runs>",args[0]),
     }
 }
 
@@ -36,7 +36,7 @@ fn stage1<T: Int + Typable + From<u64> + Copy + Debug>(args: Vec<String>) {
         "vebtree" => stage2::<T,VEBTree>(args),
         "btree" => stage2::<T,BTreeMap<T,T>>(args),
 		"binary" => stage2::<T,BinarySearch<T>>(args),
-        _ => println!("Bitte verwende {} <stree|vebtree|btree|binary> <pred|new> <u40|u48|u64> <uniform|normal/bereich_viertel|normal/bereich_komplett|bwt_runs>",args[0]),
+        _ => println!("Bitte verwende {} <stree|vebtree|btree|binary> <pred|new> <u40|u48|u64> <uniform|normal|bwt_runs>",args[0]),
     }
 }
 
@@ -44,6 +44,6 @@ fn stage2<T: Int + Typable + From<u64> + Copy + Debug, U: Clone + PredecessorSet
     match args[2].as_ref() {
 		"new" => static_build_benchmark::<T,U>(args[4].as_ref()),
 		"pred" => pred_and_succ_benchmark::<T,U>(args[4].as_ref()),
-		_ => println!("Bitte verwende {} <stree|vebtree|btree|binary> <pred|new> <u40|u48|u64> <uniform|normal/bereich_viertel|normal/bereich_komplett|bwt_runs>",args[0]),
+		_ => println!("Bitte verwende {} <stree|vebtree|btree|binary> <pred|new> <u40|u48|u64> <uniform|normal|bwt_runs>",args[0]),
 	}
 }
