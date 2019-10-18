@@ -14,8 +14,7 @@ use criterion::black_box;
 use vebtrees::VEBTree as vs;
 
 use uint::{Typable};
-use ma_titan::default::immutable::{Int, Pointer,STree};
-use ma_titan::internal::Splittable;
+use ma_titan::default::immutable::{Int, STree};
 use super::{SAMPLE_SIZE,REPEATS};
 
 const SEED: u128 = 0xcafef00dd15ea5e5;
