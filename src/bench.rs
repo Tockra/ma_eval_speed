@@ -38,8 +38,12 @@ pub fn static_build_benchmark<E: Typable + From<u64> + Copy + Debug, T: Predeces
         if path.to_str().unwrap().contains("git") {
             continue;
         }
-        println!("{:?}",path);
         
+        let i: u32 = path.to_str().unwrap().split('^').skip(1).next().unwrap().split('.').next().unwrap().parse().unwrap();
+        if i > 28 {
+            continue;
+        }
+        println!("{:?}",path);
         let values = read_from_file::<E>(path.to_str().unwrap()).unwrap();
 
         let len = values.len();
@@ -63,6 +67,10 @@ pub fn create_output() {
    
     for dir in read_dir(format!("testdata/normal/bereich_komplett/u40/")).unwrap() {
         let path = dir.unwrap().path();
+        let i: u32 = path.to_str().unwrap().split('^').skip(1).next().unwrap().split('.').next().unwrap().parse().unwrap();
+        if i > 28 {
+            continue;
+        }
         println!("{:?}",path);
         
         let values = read_from_file::<uint::u40>(path.to_str().unwrap()).unwrap();
