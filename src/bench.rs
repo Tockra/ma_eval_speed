@@ -212,9 +212,9 @@ impl<T: Int> PredecessorSetStatic<T> for VEBTree {
         self.veb_tree.maximum().and_then(|x| Some(T::new(x as u64)))
     } 
 
-    fn contains(&self, number: T) -> bool {
+    /*fn contains(&self, number: T) -> bool {
         self.veb_tree.contains((number.into()) as usize)
-    }
+    }*/
 }
 
 #[derive(Clone)]
@@ -261,9 +261,9 @@ impl<T: Int>  PredecessorSetStatic<T> for BinarySearch<T> {
         }
     }
 
-    fn contains(&self, number: T) -> bool {
+    /*fn contains(&self, number: T) -> bool {
         self.element_list.contains(&number)
-    }
+    }*/
 
     const TYPE: &'static str = "BinarySearch";
 }
@@ -325,7 +325,7 @@ pub trait PredecessorSetStatic<T> {
     fn successor(&self,number: T) -> Option<T>; // Optional
     fn minimum(&self) -> Option<T>;
     fn maximum(&self) -> Option<T>; 
-    fn contains(&self, number: T) -> bool;
+    //fn contains(&self, number: T) -> bool;
 
     const TYPE: &'static str;
 }
@@ -353,7 +353,7 @@ impl<T: Int> PredecessorSetStatic<T> for STree<T> {
         self.maximum()
     } 
 
-    fn contains(&self, number: T) -> bool {
+    /*fn contains(&self, number: T) -> bool {
         let (i,j,k) = Splittable::split_integer_down(&number);
         if self.root_table[i].is_null()  {
             return false;
@@ -388,7 +388,7 @@ impl<T: Int> PredecessorSetStatic<T> for STree<T> {
                 self.element_list[*e] == number
             }
         }
-    }
+    }*/
 }
 
 impl<T: Int>  PredecessorSetStatic<T> for BTreeMap<T,T> {
@@ -416,9 +416,9 @@ impl<T: Int>  PredecessorSetStatic<T> for BTreeMap<T,T> {
         self.range(T::from(0)..).rev().next().map(|x| *x.0)
     }
 
-    fn contains(&self, number: T) -> bool {
+    /*fn contains(&self, number: T) -> bool {
         self.contains_key(&number)
-    }
+    }*/
 
     const TYPE: &'static str = "B-Baum";
 }
