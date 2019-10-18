@@ -44,12 +44,12 @@ pub fn static_build_benchmark<E: Typable + From<u64> + Copy + Debug, T: Predeces
 
         let len = values.len();
         let now = Instant::now();
-        for _ in 0..SAMPLE_SIZE {
-            let result_ds = T::new(values.clone());
-            ::std::mem::size_of_val(&result_ds);
-        }
+        
+        let result_ds = T::new(values.clone());
+        ::std::mem::size_of_val(&result_ds);
+        
         let elapsed_time = now.elapsed().as_nanos();
-        writeln!(result, "RESULT algo={} method=new size={} time={} unit=ns repeats={}",T::TYPE, len, elapsed_time, SAMPLE_SIZE).unwrap(); 
+        writeln!(result, "RESULT algo={} method=new size={} time={} unit=ns repeats={}",T::TYPE, len, elapsed_time, 1).unwrap(); 
           
         result.flush().unwrap();
         
