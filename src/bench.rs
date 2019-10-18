@@ -108,7 +108,7 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
         let values = read_from_file::<E>(path.to_str().unwrap()).unwrap();
         let size = values.len();
         println!("Test-Elemente eingelesen");
-        let test_values = read_from_file::<E>(&format!("input/pred/{}/{}/min{}_max{}.data",data,T::TYPE,values[0].into(),values[size-1].into())).unwrap();
+        let test_values = read_from_file::<E>(&format!("input/pred/{}/{}/min{}_max{}.data",data,E::TYPE,values[0].into(),values[size-1].into())).unwrap();
         println!("Test-Values eingelesen");
         let repeats = test_values.len();
 
