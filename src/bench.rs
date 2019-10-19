@@ -40,7 +40,7 @@ pub fn static_build_benchmark<E: Typable + From<u64> + Copy + Debug, T: Predeces
         }
         
         let i: u32 = path.to_str().unwrap().split('^').skip(1).next().unwrap().split('.').next().unwrap().parse().unwrap();
-        if i > 28 {
+        if if data != "bwt_runs" && i > 28 {
             continue;
         }
         println!("{:?}",path);
@@ -103,7 +103,7 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
             continue;
         }
         let i: u32 = path.to_str().unwrap().split('^').skip(1).next().unwrap().split('.').next().unwrap().parse().unwrap();
-        if i > 29 {
+        if data != "bwt_runs" && i > 29 {
             continue;
         }
         println!("{:?}",path);
