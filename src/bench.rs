@@ -40,7 +40,7 @@ pub fn static_build_benchmark<E: Typable + From<u64> + Copy + Debug, T: Predeces
         }
         
         let i: u32 = path.to_str().unwrap().split('^').skip(1).next().unwrap().split('.').next().unwrap().parse().unwrap();
-        if if data != "bwt_runs" && i > 28 {
+        if data != "bwt_runs" && i > 28 {
             continue;
         }
         println!("{:?}",path);
