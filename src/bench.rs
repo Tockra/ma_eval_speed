@@ -90,13 +90,13 @@ pub fn create_output() {
 pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64> + Into<u64>, T: Clone + PredecessorSetStatic<E>>(data: &str) {
     println!("Starte Laufzeitmessung pred(). Datenstruktur: {}, Datentyp {}, Datensatz: {}", E::TYPE, T::TYPE, data);
     let bench_start = Instant::now();
-    std::fs::create_dir_all("./output/pred/").unwrap();
+    std::fs::create_dir_all(format!("./output/pred/{}",E::TYPE)).unwrap();
     let mut result = BufWriter::new(OpenOptions::new()
         .read(true)
         .write(true)
         .truncate(true)
         .create(true)
-        .open(format!("output/pred/{}_{}.txt",T::TYPE,data.replace("/", "_"))).unwrap());
+        .open(format!("output/pred/{}/{}_{}.txt",E::TYPE,T::TYPE,data.replace("/", "_"))).unwrap());
     for dir in read_dir(format!("testdata/{}/{}/",data, E::TYPE)).unwrap() {
         let path = dir.unwrap().path();
         if path.to_str().unwrap().contains("git") {
