@@ -68,7 +68,7 @@ pub fn create_output() {
     for dir in read_dir(format!("testdata/normal/bereich_komplett/u40/")).unwrap() {
         let path = dir.unwrap().path();
         let i: u32 = path.to_str().unwrap().split('^').skip(1).next().unwrap().split('.').next().unwrap().parse().unwrap();
-        if i > 28 {
+        if i > 29 {
             continue;
         }
         println!("{:?}",path);
@@ -100,6 +100,10 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
     for dir in read_dir(format!("testdata/{}/{}/",data, E::TYPE)).unwrap() {
         let path = dir.unwrap().path();
         if path.to_str().unwrap().contains("git") {
+            continue;
+        }
+        let i: u32 = path.to_str().unwrap().split('^').skip(1).next().unwrap().split('.').next().unwrap().parse().unwrap();
+        if i > 29 {
             continue;
         }
         println!("{:?}",path);
