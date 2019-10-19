@@ -39,10 +39,13 @@ pub fn static_build_benchmark<E: Typable + From<u64> + Copy + Debug, T: Predeces
             continue;
         }
         
-        let i: u32 = path.to_str().unwrap().split('^').skip(1).next().unwrap().split('.').next().unwrap().parse().unwrap();
-        if data != "bwt_runs" && i > 28 {
-            continue;
+        if data != "bwt_runs" {
+            let i: u32 = path.to_str().unwrap().split('^').skip(1).next().unwrap().split('.').next().unwrap().parse().unwrap();
+            if i > 28 {
+                continue;
+            }
         }
+        
         println!("{:?}",path);
         let values = read_from_file::<E>(path.to_str().unwrap()).unwrap();
 
