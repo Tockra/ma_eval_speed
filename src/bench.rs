@@ -56,7 +56,7 @@ pub fn static_build_benchmark<E: Typable + From<u64> + Copy + Debug, T: Predeces
         ::std::mem::size_of_val(&result_ds);
         
         let elapsed_time = now.elapsed().as_nanos();
-        writeln!(result, "RESULT algo={} method=new size={} time={} unit=ns repeats={}",T::TYPE, len, elapsed_time, 1).unwrap(); 
+        writeln!(result, "RESULT algo={}_{} method=new size={} time={} unit=ns repeats={}",T::TYPE, data, len, elapsed_time, 1).unwrap(); 
           
         result.flush().unwrap();
         
@@ -137,7 +137,7 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
             if i % 10 == 0 {
                 println!("Fortschritt: {}%",i*100/SAMPLE_SIZE);
             }
-            writeln!(result, "RESULT algo={} method=predecessor size={} time={} unit=ns repeats={}",T::TYPE, size*std::mem::size_of::<E>(), elapsed_time, repeats).unwrap();
+             writeln!(result, "RESULT algo={}_{} method=predecessor size={} element_size={} time={} unit=ns repeats={}",T::TYPE, data, size*std::mem::size_of::<E>(), std::mem::size_of::<E>(), elapsed_time, repeats).unwrap(); 
         }}
         {
         let values = read_from_file::<E>(path.to_str().unwrap()).unwrap();
@@ -162,7 +162,7 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
             if i % 10 == 0 {
                 println!("Fortschritt: {}%",i*100/SAMPLE_SIZE);
             }
-            writeln!(result, "RESULT algo={} method=successor size={} time={} unit=ns repeats={}",T::TYPE, size*std::mem::size_of::<E>(), elapsed_time, repeats).unwrap();
+            writeln!(result, "RESULT algo={}_{} method=successor size={} element_size={} time={} unit=ns repeats={}",T::TYPE, data, size*std::mem::size_of::<E>(), std::mem::size_of::<E>(), elapsed_time, repeats).unwrap(); 
         }}
         result.flush().unwrap();
     }
