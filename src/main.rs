@@ -51,7 +51,7 @@ fn eval_binary_search(result: &mut BufWriter<std::fs::File>) {
             let elapsed_time = now.elapsed().as_nanos();
             std::mem::size_of_val(&x);
 
-            writeln!(result, "RESULT algo=hashmap_bs<(usize,u64)> size={} time_per_anfrage={}",i,elapsed_time as f64/(i as f64)).unwrap(); 
+            writeln!(result, "RESULT algo=hashmap_bs<(u16,u64)> size={} time_per_anfrage={}",i,elapsed_time as f64/(i as f64)).unwrap(); 
             result.flush().unwrap();
         }
     }
