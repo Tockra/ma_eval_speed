@@ -46,11 +46,14 @@
   \begin{axis}[
     title={Laufzeit get()},
     xlabel={Anzahl der Schlüssel in der Datenstruktur},
-    ylabel={Laufzeit pro get()-Anfrage [Nanosekunden / 100.000 Anfragen]},
+    ylabel={Laufzeit pro get()-Anfrage [Nanosekunden / Anfragen]},
     ]
 
     %% MULTIPLOT(algo) SELECT size AS x, MEDIAN(time_per_anfrage) AS y, MULTIPLOT
-    %% FROM stats GROUP BY MULTIPLOT,x ORDER BY MULTIPLOT,x
+    %% FROM stats WHERE x % 100 == 0  GROUP BY MULTIPLOT,x ORDER BY MULTIPLOT,x
+    \addplot coordinates { (100,35.09) (200,48.81) (300,52.7367) (400,52.9825) (500,52.283) (600,53.2517) (700,52.7879) (800,52.6769) (900,52.8206) (1000,52.069) (1100,54.68) (1200,54.6096) (1300,56.8681) (1400,54.3132) (1500,54.5673) (1600,53.07) (1700,56.4509) (1800,53.0128) (1900,52.7363) (2000,52.5615) };
+    \addlegendentry{algo=mphf<u16,\_>};
+    
 
 
 

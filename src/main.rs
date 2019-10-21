@@ -51,7 +51,7 @@ fn eval_binary_search(result: &mut BufWriter<std::fs::File>) {
             let elapsed_time = now.elapsed().as_nanos();
             std::mem::size_of_val(&x);
 
-            writeln!(result, "RESULT algo=mphf<u16,_> size={} time_per_anfrage={}",i,elapsed_time as f64/(i as f64)).unwrap(); 
+            writeln!(result, "RESULT algo=hashmap_bs<(usize,u64)> size={} time_per_anfrage={}",i,elapsed_time as f64/(i as f64)).unwrap(); 
             result.flush().unwrap();
         }
     }
@@ -59,8 +59,8 @@ fn eval_binary_search(result: &mut BufWriter<std::fs::File>) {
 
 fn eval_mphf(result: &mut BufWriter<std::fs::File>) {
     std::thread::sleep(std::time::Duration::from_millis(1000));
+    
     for _ in 0..SAMPLE_SIZE {
-
         for i in 2..2048 {
             let keys = build_uniform(i);
             let objects = vec![0_u64;i as usize];
@@ -75,7 +75,7 @@ fn eval_mphf(result: &mut BufWriter<std::fs::File>) {
             let elapsed_time = now.elapsed().as_nanos();
             std::mem::size_of_val(&x);
 
-            writeln!(result, "RESULT algo=mphf<u16,_> size={} time_per_anfrage={}",i,elapsed_time as f64/(i as f64)).unwrap(); 
+            writeln!(result, "RESULT algo=mphf<u16,u64> size={} time_per_anfrage={}",i,elapsed_time as f64/(i as f64)).unwrap(); 
             result.flush().unwrap();
         }
     }
