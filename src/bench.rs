@@ -129,8 +129,9 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
         println!("Datenstruktur erstellt");
         for i in 0..SAMPLE_SIZE {
             cache_clear();
+            let iter = test_values.iter();
             let now = Instant::now();
-            for elem in test_values.iter() {
+            for elem in iter {
                 data_structure.predecessor(*elem);
             }
             let elapsed_time = now.elapsed().as_nanos();
@@ -154,8 +155,9 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
 
         for i in 0..SAMPLE_SIZE {
             cache_clear();
+            let iter = test_values.iter();
             let now = Instant::now();
-            for elem in test_values.iter() {
+            for elem in iter {
                 data_structure.successor(*elem);
             }
             let elapsed_time = now.elapsed().as_nanos();
