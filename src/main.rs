@@ -44,8 +44,8 @@ fn eval_binary_search(result: &mut BufWriter<std::fs::File>) {
             let mut x = 0;
             let now = Instant::now();
             for key in iter {
-                x = *match keys.binary_search(&key) {
-                    Ok(x) => objects.get(x).unwrap(),
+                x = match keys.binary_search(&key) {
+                    Ok(x) => objects[x],
                     _ => panic!("get in internal wurde mit ungültigem Schlüssel {} aufgerufen. {:?}", *key,keys),
                 };
             }
