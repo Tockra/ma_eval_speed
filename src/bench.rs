@@ -129,15 +129,16 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
         println!("Datenstruktur erstellt");
         for i in 0..SAMPLE_SIZE {
             cache_clear();
+            let iter = test_values.iter();
             let now = Instant::now();
-            for elem in test_values.iter() {
+            for elem in iter {
                 data_structure.predecessor(*elem);
             }
             let elapsed_time = now.elapsed().as_nanos();
             if i % 10 == 0 {
                 println!("Fortschritt: {}%",i*100/SAMPLE_SIZE);
             }
-            writeln!(result, "RESULT algo={}_{} method=predecessor size={} element_size={} time={} unit=ns repeats={}",T::TYPE, data, size*std::mem::size_of::<E>(), std::mem::size_of::<E>(), elapsed_time, repeats).unwrap();
+            writeln!(result, "RESULT algo={}_{} method=predecessor size={} element_size={} time={} unit=ns repeats={}",T::TYPE, data, size*std::mem::size_of::<E>(), std::mem::size_of::<E>(), elapsed_time, repeats).unwrap(); 
         }}
         {
         let values = read_from_file::<E>(path.to_str().unwrap()).unwrap();
@@ -154,15 +155,16 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
 
         for i in 0..SAMPLE_SIZE {
             cache_clear();
+            let iter = test_values.iter();
             let now = Instant::now();
-            for elem in test_values.iter() {
+            for elem in iter {
                 data_structure.successor(*elem);
             }
             let elapsed_time = now.elapsed().as_nanos();
             if i % 10 == 0 {
                 println!("Fortschritt: {}%",i*100/SAMPLE_SIZE);
             }
-            writeln!(result, "RESULT algo={}_{} method=successor size={} element_size={} time={} unit=ns repeats={}",T::TYPE, data, size*std::mem::size_of::<E>(), std::mem::size_of::<E>(), elapsed_time, repeats).unwrap();
+            writeln!(result, "RESULT algo={}_{} method=successor size={} element_size={} time={} unit=ns repeats={}",T::TYPE, data, size*std::mem::size_of::<E>(), std::mem::size_of::<E>(), elapsed_time, repeats).unwrap(); 
         }}
         result.flush().unwrap();
     }
@@ -248,18 +250,24 @@ impl<T: Int>  PredecessorSetStatic<T> for BinarySearch<T> {
     }
 
     fn predecessor(&self,number: T) -> Option<T> {
-        if self.element_list.len() == 0 {
+        if self.element_list.len() == 0 || number < self.element_list[0] {
             None
         } else {
-            self.pred(number, 0, self.element_list.len()-1)
+            match self.element_list.binary_search(&number) {
+                Ok(x) => Some(self.element_list[x]),
+                Err(x) => Some(self.element_list[x-1])
+            }
         }
     }
 
     fn successor(&self,number: T) -> Option<T>{
-        if self.element_list.len() == 0 {
+        if self.element_list.len() == 0 || number > self.element_list[self.element_list.len()-1] {
             None
         } else {
-            self.succ(number, 0, self.element_list.len()-1)
+            match self.element_list.binary_search(&number) {
+                Ok(x) => Some(self.element_list[x]),
+                Err(x) => Some(self.element_list[x])
+            }
         }
     }
     
@@ -284,57 +292,6 @@ impl<T: Int>  PredecessorSetStatic<T> for BinarySearch<T> {
     }*/
 
     const TYPE: &'static str = "BinarySearch";
-}
-
-impl<T: Int> BinarySearch<T> {
-    fn succ(&self, element: T, l: usize, r: usize) -> Option<T> {
-        let mut l = l;
-        let mut r = r;
-
-        if element >= self.element_list[r] {
-            return None;
-        }
-
-        while r != l && element > self.element_list[l]  {
-            let m = (l+r)/2;
-            if element >= self.element_list[m] {
-                l = m+1;
-            } else {
-                r = m;
-            }
-        }
-        if element <= self.element_list[l] {
-            Some(self.element_list[l])
-        } else {
-            None
-        }
-    }
-
-    fn pred(&self, element: T, l: usize, r: usize) -> Option<T> {
-        let mut l = l;
-        let mut r = r;
-
-        if element <= self.element_list[l] {
-            return None;
-        } 
-
-        while l != r && element < self.element_list[r] {
-            let m = (l+r)/2;
-            if self.element_list[m] < element {
-                l = m+1;
-            } else {
-                r = m;
-            }
-        }
-
-        if element >= self.element_list[r] {
-            Some(self.element_list[r])
-        } else {
-            None
-        }
-    }
-
-
 }
 
 pub trait PredecessorSetStatic<T> {
