@@ -11,4 +11,4 @@ rand = "0.7.0"
 rand_pcg = "0.2.0"
 rand_distr = "0.2.2"
 boomphf = "0.5.2"
-
+hashbrown = "0.6.1"

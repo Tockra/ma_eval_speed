@@ -25,7 +25,7 @@ fn main() {
 
     eval_mphf(&mut result);
     eval_binary_search(&mut result);
-       
+    eval_brown(&mut result);
 }
 
 fn eval_binary_search(result: &mut BufWriter<std::fs::File>) {
@@ -35,7 +35,7 @@ fn eval_binary_search(result: &mut BufWriter<std::fs::File>) {
       
     for _ in 0..SAMPLE_SIZE {
             
-        for i in 2..2048 {
+        for i in 2..4000 {
             let keys = Box::new(build_uniform(i));
             let objects = Box::new(vec![0_u64; i as usize]);
             
@@ -62,7 +62,7 @@ fn eval_mphf(result: &mut BufWriter<std::fs::File>) {
     std::thread::sleep(std::time::Duration::from_millis(1000));
     
     for _ in 0..SAMPLE_SIZE {
-        for i in 2..2048 {
+        for i in 2..4000 {
             let keys = build_uniform(i);
             let objects = vec![0_u64;i as usize];
             let hash_map = Mphf::new(2.0, &keys);
@@ -77,6 +77,33 @@ fn eval_mphf(result: &mut BufWriter<std::fs::File>) {
             std::mem::size_of_val(&x);
 
             writeln!(result, "RESULT algo=mphf<u16,u64> size={} time_per_anfrage={}",i,elapsed_time as f64/(i as f64)).unwrap(); 
+            result.flush().unwrap();
+        }
+    }
+}
+
+fn eval_brown(result: &mut BufWriter<std::fs::File>) {
+    std::thread::sleep(std::time::Duration::from_millis(1000));
+    
+    for _ in 0..SAMPLE_SIZE {
+        for i in 2..4000 {
+            let keys = build_uniform(i);
+            let mut hash_map = hashbrown::HashMap::with_capacity(i as usize);
+
+            for key in keys.iter() {
+                hash_map.insert(key, 0_u64);
+            }
+
+            let iter = keys.iter();
+            let mut x = 0;
+            let now = Instant::now();
+            for key in iter {
+                x = *hash_map.get(&key).unwrap();
+            }
+            let elapsed_time = now.elapsed().as_nanos();
+            std::mem::size_of_val(&x);
+
+            writeln!(result, "RESULT algo=brown_hash<u16,u64> size={} time_per_anfrage={}",i,elapsed_time as f64/(i as f64)).unwrap(); 
             result.flush().unwrap();
         }
     }
