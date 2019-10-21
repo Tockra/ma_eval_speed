@@ -36,16 +36,17 @@ fn eval_binary_search(result: &mut BufWriter<std::fs::File>) {
     for _ in 0..SAMPLE_SIZE {
             
         for i in 2..2048 {
-            let keys = build_uniform(i);
-            let key_map: Vec<(u16,u64)> = keys.clone().into_iter().map(|x| (x,0_u64)).collect();
+            let keys = Box::new(build_uniform(i));
+            let objects = Box::new(vec![0_u64; i as usize]);
+            
 
             let iter = keys.iter();
             let mut x = 0;
             let now = Instant::now();
             for key in iter {
-                x = *match key_map.binary_search_by_key(key,|&(a,_)| a) {
-                    Ok(x) => &key_map.get(x).unwrap().1,
-                    _ => panic!("get in internal wurde mit ungültigem Schlüssel {} aufgerufen. {:?}", *key,key_map),
+                x = *match keys.binary_search(&key) {
+                    Ok(x) => objects.get(x).unwrap(),
+                    _ => panic!("get in internal wurde mit ungültigem Schlüssel {} aufgerufen. {:?}", *key,keys),
                 };
             }
             let elapsed_time = now.elapsed().as_nanos();
