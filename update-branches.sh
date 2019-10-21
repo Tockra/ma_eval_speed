@@ -22,3 +22,9 @@ git push &&
 git checkout hash_brown_build &&
 git merge --no-edit master &&
 git push 
+git checkout space_efficient_128 &&
+git merge --no-edit master &&
+git push 
+git checkout space_efficient_max &&
+git merge --no-edit master &&
+git push 
