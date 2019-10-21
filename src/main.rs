@@ -1,4 +1,3 @@
-pub mod bench;
 use std::time::{Instant};
 use std::io::BufWriter;
 use std::fs::OpenOptions;
@@ -17,35 +16,66 @@ fn main() {
 
     
     std::fs::create_dir_all("./output/").unwrap();
-
-    eval_mphf();
-
-       
-}
-
-fn eval_mphf() {
     let mut result = BufWriter::new(OpenOptions::new()
         .read(true)
         .write(true)
         .truncate(true)
         .create(true)
         .open("output/mphf_vs_bs.txt").unwrap());
+
+    eval_mphf(&mut result);
+    eval_binary_search(&mut result);
+       
+}
+
+fn eval_binary_search(result: &mut BufWriter<std::fs::File>) {
+
     std::thread::sleep(std::time::Duration::from_millis(1000));
 
-    for i in 0..u16::max_value() {
-        let keys = build_uniform(i);
-        let objects = vec![0_u64;i as usize];
-        let hash_map = Mphf::new(2.0, &keys);
-        for i in 0..SAMPLE_SIZE {
+      
+    for _ in 0..SAMPLE_SIZE {
+            
+        for i in 2..2048 {
+            let keys = build_uniform(i);
+            let key_map: Vec<(u16,u64)> = keys.clone().into_iter().map(|x| (x,0_u64)).collect();
+
             let iter = keys.iter();
+            let mut x = 0;
             let now = Instant::now();
             for key in iter {
-                let x = objects[hash_map.try_hash(&key).unwrap() as usize];
-                 std::mem::size_of_val(&x);
+                x = *match key_map.binary_search_by_key(key,|&(a,_)| a) {
+                    Ok(x) => &key_map.get(x).unwrap().1,
+                    _ => panic!("get in internal wurde mit ungültigem Schlüssel {} aufgerufen. {:?}", *key,key_map),
+                };
             }
             let elapsed_time = now.elapsed().as_nanos();
+            std::mem::size_of_val(&x);
 
-            writeln!(result, "RESULT algo=mphf<u16,_> size={} time={} iterations={}",i,elapsed_time,SAMPLE_SIZE).unwrap(); 
+            writeln!(result, "RESULT algo=mphf<u16,_> size={} time_per_anfrage={}",i,elapsed_time as f64/(i as f64)).unwrap(); 
+            result.flush().unwrap();
+        }
+    }
+}
+
+fn eval_mphf(result: &mut BufWriter<std::fs::File>) {
+    std::thread::sleep(std::time::Duration::from_millis(1000));
+    for _ in 0..SAMPLE_SIZE {
+
+        for i in 2..2048 {
+            let keys = build_uniform(i);
+            let objects = vec![0_u64;i as usize];
+            let hash_map = Mphf::new(2.0, &keys);
+        
+            let iter = keys.iter();
+            let mut x = 0;
+            let now = Instant::now();
+            for key in iter {
+                x = objects[hash_map.try_hash(&key).unwrap() as usize];
+            }
+            let elapsed_time = now.elapsed().as_nanos();
+            std::mem::size_of_val(&x);
+
+            writeln!(result, "RESULT algo=mphf<u16,_> size={} time_per_anfrage={}",i,elapsed_time as f64/(i as f64)).unwrap(); 
             result.flush().unwrap();
         }
     }
@@ -65,6 +95,7 @@ fn build_uniform(max_value: u16) -> Vec<u16> {
         memory.insert(random_val);
         result.push(random_val);
     }
+    result.sort();
     result
 }
 
