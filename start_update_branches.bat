@@ -1,1 +1,0 @@
-wsl update-branches.sh
