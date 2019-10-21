@@ -1,3 +1,6 @@
 /target
 **/*.rs.bk
 Cargo.lock
+*.aux
+*.gz
+*.log
