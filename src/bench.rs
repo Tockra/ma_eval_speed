@@ -135,6 +135,7 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
                 println!("Fortschritt: {}%",i*100/SAMPLE_SIZE);
             }
              writeln!(result, "RESULT algo={}_{} method=predecessor size={} element_size={} time={} unit=ns repeats={}",T::TYPE, data, size*std::mem::size_of::<E>(), std::mem::size_of::<E>(), elapsed_time, repeats).unwrap(); 
+            result.flush().unwrap();
         }}
         {
         let values = read_from_file::<E>(path.to_str().unwrap()).unwrap();
@@ -161,8 +162,9 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
                 println!("Fortschritt: {}%",i*100/SAMPLE_SIZE);
             }
             writeln!(result, "RESULT algo={}_{} method=successor size={} element_size={} time={} unit=ns repeats={}",T::TYPE, data, size*std::mem::size_of::<E>(), std::mem::size_of::<E>(), elapsed_time, repeats).unwrap(); 
+            result.flush().unwrap();
         }}
-        result.flush().unwrap();
+
     }
     println!("Laufzeitmessung der Predecessor- und Successor-Methoden beendet. Dauer {} Sekunden", bench_start.elapsed().as_secs())
 }
