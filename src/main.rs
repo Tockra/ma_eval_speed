@@ -30,15 +30,15 @@ fn main() {
         }
         for (i,val) in test_values.into_iter().enumerate() {
             if i % 1000 == 0{
-                println!("{}", val);
+                println!("{:?}", bs.predecessor(val));
             }
             if bs.predecessor(val) != rb.predecessor(val).map(|x| *x) {
                 panic!("Gesucht: {} , bs_found {:?}, stree_found {:?}, data={:?}", val, bs.predecessor(val), rb.predecessor(val).map(|x| *x), path);
             }
 
-           /* if bs.successor(val) != rb.successor(val) {
-                panic!("Gesucht: {} , bs_found {:?}, stree_found {:?}, data={:?}", val, bs.successor(val), rb.successor(val), path);
-            }*/
+            if bs.successor(val) != rb.successor(val).map(|x| *x) {
+                panic!("Gesucht: {} , bs_found {:?}, stree_found {:?}, data={:?}", val, bs.successor(val), rb.successor(val).map(|x| *x), path);
+            }
 
             
         }
