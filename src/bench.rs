@@ -11,7 +11,6 @@ use std::collections::BTreeMap;
 use rand_pcg::Mcg128Xsl64;
 use rand::Rng;
 use criterion::black_box;
-use vebtrees::VEBTree as vs;
 
 use uint::{Typable};
 use ma_titan::default::immutable::{Int, STree};
@@ -135,7 +134,7 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
             if i % 10 == 0 {
                 println!("Fortschritt: {}%",i*100/SAMPLE_SIZE);
             }
-             writeln!(result, "RESULT algo={}_{} method=predecessor size={} element_size={} time={} unit=ns repeats={}",T::TYPE, data, size*std::mem::size_of::<E>(), std::mem::size_of::<E>(), elapsed_time, repeats).unwrap(); 
+            writeln!(result, "RESULT algo={}_{} method=predecessor size={} element_size={} time={} unit=ns repeats={}",T::TYPE, data, size*std::mem::size_of::<E>(), std::mem::size_of::<E>(), elapsed_time, repeats).unwrap(); 
         }}
         {
         let values = read_from_file::<E>(path.to_str().unwrap()).unwrap();
@@ -195,43 +194,32 @@ pub fn cache_clear() {
     buf.flush().unwrap();
 }
 
-#[derive(Clone,Debug, PartialEq, Eq)]
-pub struct VEBTree {
-    veb_tree: vs<usize>
+#[derive(Clone)]
+pub struct RBTree<T> where T: Int + Default + num::Bounded {
+    rb: treez::rb::TreeRb<T,T>
 }
 
-impl<T: Int> PredecessorSetStatic<T> for VEBTree {
-    const TYPE: &'static str = "vEB-Tree";
+impl<T: Int + Default + num::Bounded> PredecessorSetStatic<T> for RBTree<T> {
+    const TYPE: &'static str = "Rot-Schwarz-Baum";
 
     fn new(elements: Box<[T]>) -> Self {
-        let mut vtree = vs::with_capacity((elements[elements.len()-1]).into() as usize);
-        for &elem in elements.iter() {
-            vtree.insert((elem.into()) as usize);
+        let mut rb = treez::rb::TreeRb::with_capacity(elements.len());
+        for &elem in elements.into_iter() {
+            rb.insert(elem,elem);
         }
+        rb.shrink_to_fit();
         Self {
-            veb_tree: vtree,
+            rb: rb,
         }
     }
 
     fn predecessor(&self,number: T) -> Option<T> {
-        self.veb_tree.findprev((number.into()) as usize).and_then(|x| Some(T::new(x as u64)))
+        self.rb.predecessor(number).map(|x| *x)
     }
 
     fn successor(&self,number: T) -> Option<T> {
-        self.veb_tree.findnext((number.into()) as usize).and_then(|x| Some(T::new(x as u64)))
+        self.rb.successor(number).map(|x| *x)
     }
-
-    fn minimum(&self) -> Option<T> {
-        self.veb_tree.minimum().and_then(|x| Some(T::new(x as u64)))
-    }
-
-    fn maximum(&self) -> Option<T> {
-        self.veb_tree.maximum().and_then(|x| Some(T::new(x as u64)))
-    } 
-
-    /*fn contains(&self, number: T) -> bool {
-        self.veb_tree.contains((number.into()) as usize)
-    }*/
 }
 
 #[derive(Clone)]
@@ -267,26 +255,6 @@ impl<T: Int>  PredecessorSetStatic<T> for BinarySearch<T> {
             }
         }
     }
-    
-    fn minimum(&self) -> Option<T>{
-        if self.element_list.len() == 0 {
-            None
-        } else {
-            Some(self.element_list[0])
-        }
-    }
-
-    fn maximum(&self) -> Option<T>{
-        if self.element_list.len() == 0 {
-            None
-        } else {
-            Some(self.element_list[self.element_list.len()-1])
-        }
-    }
-
-    /*fn contains(&self, number: T) -> bool {
-        self.element_list.contains(&number)
-    }*/
 
     const TYPE: &'static str = "BinarySearch";
 }
@@ -295,10 +263,6 @@ pub trait PredecessorSetStatic<T> {
     fn new(elements: Box<[T]>) -> Self;
     fn predecessor(&self,number: T) -> Option<T>;
     fn successor(&self,number: T) -> Option<T>; // Optional
-    fn minimum(&self) -> Option<T>;
-    fn maximum(&self) -> Option<T>; 
-    //fn contains(&self, number: T) -> bool;
-
     const TYPE: &'static str;
 }
 
@@ -316,51 +280,6 @@ impl<T: Int> PredecessorSetStatic<T> for STree<T> {
     fn successor(&self,number: T) -> Option<T> {
         self.locate_or_succ(number).and_then(|x| Some(self.element_list[x]))
     }
-
-    fn minimum(&self) -> Option<T> {
-        self.minimum()
-    }
-
-    fn maximum(&self) -> Option<T> {
-        self.maximum()
-    } 
-
-    /*fn contains(&self, number: T) -> bool {
-        let (i,j,k) = Splittable::split_integer_down(&number);
-        if self.root_table[i].is_null()  {
-            return false;
-        }
-
-        match self.root_table[i].get() {
-            Pointer::Level(l) => {
-                let l3_level = (*l).try_get(j);
-                if l3_level.is_none() {
-                    return false;
-                } else {
-                    let elem_index = match l3_level.unwrap().get() {
-                        Pointer::Level(l) => {
-                            (*l).try_get(k)
-                        },
-                        Pointer::Element(e) => {
-                            Some(&*e)
-                        }
-                    };
-                    
-                        
-                    if elem_index.is_none() {
-                        false
-                    } else {
-                        self.element_list[*elem_index.unwrap()] == number
-                    }
-                }
-                
-            },
-
-            Pointer::Element(e) => {
-                self.element_list[*e] == number
-            }
-        }
-    }*/
 }
 
 impl<T: Int>  PredecessorSetStatic<T> for BTreeMap<T,T> {
@@ -379,18 +298,6 @@ impl<T: Int>  PredecessorSetStatic<T> for BTreeMap<T,T> {
     fn successor(&self,number: T) -> Option<T>{
         self.range(number..).next().map(|x| *x.0)
     }
-    
-    fn minimum(&self) -> Option<T>{
-        self.range(T::from(0)..).next().map(|x| *x.0)
-    }
-
-    fn maximum(&self) -> Option<T>{
-        self.range(T::from(0)..).rev().next().map(|x| *x.0)
-    }
-
-    /*fn contains(&self, number: T) -> bool {
-        self.contains_key(&number)
-    }*/
 
     const TYPE: &'static str = "B-Baum";
 }
