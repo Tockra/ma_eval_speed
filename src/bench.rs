@@ -20,7 +20,7 @@ use super::{SAMPLE_SIZE,REPEATS};
 const SEED: u128 = 0xcafef00dd15ea5e5;
 /// Diese Methode lädt die Testdaten aus ./testdata/{u40,u48,u64}/ und konstruiert mit Hilfe dieser eine
 /// Datenstruktur T. Dabei wird die Laufzeit gemessen.
-pub fn static_build_benchmark<E: Typable + From<u64> + Copy + Debug, T: PredecessorSetStatic<E>>(data: &str) {
+pub fn static_build_benchmark<E: Typable + From<u64> + Copy + Debug, T: PredecessorSetStatic<E>>(data: &str, name: &str) {
     println!("Starte Laufzeitmessung new(). Datenstruktur: {}, Datentyp {}, Datensatz: {}", E::TYPE, T::TYPE, data);
 
     let bench_start = Instant::now();
@@ -31,7 +31,7 @@ pub fn static_build_benchmark<E: Typable + From<u64> + Copy + Debug, T: Predeces
         .write(true)
         .truncate(true)
         .create(true)
-        .open(format!("output/new/{}_{}.txt",T::TYPE,data.replace("/", "_"))).unwrap());
+        .open(format!("output/new/{}_{}_{}.txt",T::TYPE, name, data.replace("/", "_"))).unwrap());
     
     for dir in read_dir(format!("testdata/{}/{}/",data, E::TYPE)).unwrap() {
         let path = dir.unwrap().path();
@@ -65,29 +65,29 @@ pub fn static_build_benchmark<E: Typable + From<u64> + Copy + Debug, T: Predeces
 }
 
 #[allow(dead_code)]
-pub fn create_output() {
-    std::fs::create_dir_all("input/pred/uniform/u40/").unwrap();
-   
-    for dir in read_dir(format!("testdata/normal/bereich_komplett/u40/")).unwrap() {
+pub fn create_input<E: Typable + Add<E, Output=E> + Into<u64> + std::fmt::Display + Copy + Debug + From<u64> + Into<u64>>(data: &str) {
+    std::fs::create_dir_all(format!("input/pred/{}/{}/", data, E::TYPE)).unwrap();
+
+    for dir in read_dir(format!("testdata/{}/{}/",data, E::TYPE)).unwrap() {
         let path = dir.unwrap().path();
 
         println!("{:?}",path);
         
-        let values = read_from_file::<uint::u40>(path.to_str().unwrap()).unwrap();
+        let values = read_from_file::<E>(path.to_str().unwrap()).unwrap();
       
 
         let values_len = values.len();
 
-        let test_values = get_test_values(values[0]+1u32,values[values_len-1]);
+        let test_values = get_test_values(values[0]+E::from(1u64),values[values_len-1]);
 
-        write_to_file(format!("input/pred/normal/bereich_komplett/u40/min{}_max{}.data",u64::from(values[0]),u64::from(values[values_len-1])).to_string(), &test_values).unwrap();
+        write_to_file(format!("input/pred/{}/{}/min{}_max{}.data",data, E::TYPE, values[0],values[values_len-1]).to_string(), &test_values).unwrap();
     }
 }
 
 /// Lädt die Testdaten aus ./testdata/{u40,u48,u64}/ und erzeugt mit Hilfe dieser die zu testende Datenstruktur T. 
 /// Anschließend werden 10000 gültige Vor- bzw. Nachfolger erzeugt und die Laufzeiten der Predecessor-Methode 
 /// werden mit Hilfe dieser gemessen
-pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64> + Into<u64>, T: Clone + PredecessorSetStatic<E>>(data: &str) {
+pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64> + Into<u64>, T: Clone + PredecessorSetStatic<E>>(data: &str, name: &str) {
     println!("Starte Laufzeitmessung pred(). Datenstruktur: {}, Datentyp {}, Datensatz: {}", E::TYPE, T::TYPE, data);
     let bench_start = Instant::now();
     std::fs::create_dir_all(format!("./output/pred/{}",E::TYPE)).unwrap();
@@ -96,7 +96,7 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
         .write(true)
         .truncate(true)
         .create(true)
-        .open(format!("output/pred/{}/{}_{}.txt",E::TYPE,T::TYPE,data.replace("/", "_"))).unwrap());
+        .open(format!("output/pred/{}/{}_{}_{}.txt",E::TYPE,T::TYPE, name, data.replace("/", "_"))).unwrap());
     for dir in read_dir(format!("testdata/{}/{}/",data, E::TYPE)).unwrap() {
         let path = dir.unwrap().path();
         if path.to_str().unwrap().contains("git") {
@@ -168,7 +168,7 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
     println!("Laufzeitmessung der Predecessor- und Successor-Methoden beendet. Dauer {} Sekunden", bench_start.elapsed().as_secs())
 }
 
-fn get_test_values<E: 'static + Typable + Copy + From<u64> + Into<u64> + Add<u32, Output=E>>(min: E, max: E) -> Vec<E> {
+fn get_test_values<E: Typable + Copy + From<u64> + Into<u64> >(min: E, max: E) -> Vec<E> {
     let mut state = Mcg128Xsl64::new(black_box(SEED));
     let mut test_values: Vec<E> = Vec::with_capacity(REPEATS);
 
