@@ -1,49 +1,44 @@
 pub mod bench;
 use bench::*;
 use ma_titan::default::immutable::{Int, STree};
-use uint::*;
-use std::collections::BTreeMap;
-use std::fmt::Debug;
+
+use std::fs::read_dir;
 
 pub const SAMPLE_SIZE: usize = 100;
 pub const REPEATS: usize = 100_000;
 
 
-fn main() {
-	let args: Vec<String> = std::env::args().collect();
+fn main() {	
+    for dir in read_dir(format!("testdata/normal/u64/")).unwrap() {
+        let path = dir.unwrap().path();
 
-    if args.len() != 5 {
-        println!("Bitte verwende {} <stree|vebtree|btree|binary> <pred|new> <u40|u48|u64> <uniform|normal|bwt_runs>",args[0]);
-        return;
+        println!("{:?}",path);
+        
+        let values = read_from_file::<uint::u40>(path.to_str().unwrap()).unwrap();
+      
+
+        let values_len = values.len();
+
+        let test_values = get_test_values(values[0]+1u32,values[values_len-1]);
+
+        let bs = BinarySearch::new(values.clone());
+        let stree = STree::new(values.clone());
+        
+        for (i,val) in test_values.into_iter().enumerate() {
+            if i % 1000 == 0{
+                println!("{}", val);
+            }
+            if bs.predecessor(val) != stree.predecessor(val) {
+                panic!("Gesucht: {} , bs_found {:?}, stree_found {:?}, data={:?}", val, bs.predecessor(val), stree.predecessor(val), path);
+            }
+
+            if bs.successor(val) != stree.successor(val) {
+                panic!("Gesucht: {} , bs_found {:?}, stree_found {:?}, data={:?}", val, bs.successor(val), stree.successor(val), path);
+            }
+
+            
+        }
+        
     }
-	
-    if args[4] != "uniform" && args[4] != "normal" && args[4] != "bwt_runs" {
-        println!("Bitte verwende {} <stree|vebtree|btree|binary> <pred|new> <u40|u48|u64> <uniform|normal|bwt_runs>",args[0]);
-        return;
-    } 
 
-	match args[3].as_ref() {
-		"u40" => stage1::<u40>(args),
-		"u48" => stage1::<u48>(args),
-		"u64" => stage1::<u64>(args),
-		_ => println!("Bitte verwende {} <stree|vebtree|btree|binary> <pred|new> <u40|u48|u64> <uniform|normal|bwt_runs>",args[0]),
-    }
-}
-
-fn stage1<T: Int + Typable + From<u64> + Copy + Debug>(args: Vec<String>) {
-    match args[1].as_ref() {
-        "stree" => stage2::<T,STree<T>>(args),
-        "vebtree" => stage2::<T,VEBTree>(args),
-        "btree" => stage2::<T,BTreeMap<T,T>>(args),
-		"binary" => stage2::<T,BinarySearch<T>>(args),
-        _ => println!("Bitte verwende {} <stree|vebtree|btree|binary> <pred|new> <u40|u48|u64> <uniform|normal|bwt_runs>",args[0]),
-    }
-}
-
-fn stage2<T: Int + Typable + From<u64> + Copy + Debug, U: Clone + PredecessorSetStatic<T>>(args: Vec<String>) {
-    match args[2].as_ref() {
-		"new" => static_build_benchmark::<T,U>(args[4].as_ref()),
-		"pred" => pred_and_succ_benchmark::<T,U>(args[4].as_ref()),
-		_ => println!("Bitte verwende {} <stree|vebtree|btree|binary> <pred|new> <u40|u48|u64> <uniform|normal|bwt_runs>",args[0]),
-	}
 }
