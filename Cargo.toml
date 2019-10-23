@@ -13,3 +13,4 @@ criterion = "0.3.0"
 uint = { git = "https://github.com/Tockra/uint.git" }
 vebtrees = {git = "https://github.com/Tockra/rust-vebtrees.git"}
 ma_titan = { git = "https://github.com/Tockra/ma_titan.git" }
+treez = { git = "https://github.com/Tockra/treez.git"}
