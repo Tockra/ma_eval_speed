@@ -9,7 +9,7 @@ pub const REPEATS: usize = 100_000;
 
 
 fn main() {	
-    for dir in read_dir(format!("testdata/normal/u64/")).unwrap() {
+    for dir in read_dir(format!("testdata/normal/u40/")).unwrap() {
         let path = dir.unwrap().path();
 
         println!("{:?}",path);
