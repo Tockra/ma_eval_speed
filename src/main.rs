@@ -6,7 +6,8 @@ use std::collections::BTreeMap;
 use std::fmt::{Display, Debug};
 use std::ops::Add;
 
-pub const SAMPLE_SIZE: usize = 100;
+pub const SAMPLE_NEW: usize = 10;
+pub const SAMPLE_PRED: usize = 100;
 pub const REPEATS: usize = 100_000;
 
 
