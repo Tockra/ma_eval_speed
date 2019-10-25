@@ -14,7 +14,7 @@ use criterion::black_box;
 
 use uint::{Typable};
 use ma_titan::default::immutable::{Int, STree};
-use super::{SAMPLE_SIZE,REPEATS};
+use super::{SAMPLE_PRED,REPEATS};
 
 const SEED: u128 = 0xcafef00dd15ea5e5;
 /// Diese Methode lädt die Testdaten aus ./testdata/{u40,u48,u64}/ und konstruiert mit Hilfe dieser eine
@@ -119,7 +119,7 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
         let data_structure = T::new(values);
         
         println!("Datenstruktur erstellt");
-        for i in 0..SAMPLE_SIZE {
+        for i in 0..SAMPLE_PRED {
             cache_clear();
             let iter = test_values.iter();
             let now = Instant::now();
@@ -128,9 +128,9 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
             }
             let elapsed_time = now.elapsed().as_nanos();
             if i % 10 == 0 {
-                println!("Fortschritt: {}%",i*100/SAMPLE_SIZE);
+                println!("Fortschritt: {}%",i*100/SAMPLE_PRED);
             }
-             writeln!(result, "RESULT algo={}_{} method=predecessor size={} element_size={} time={} unit=ns repeats={}",T::TYPE, name, size, std::mem::size_of::<E>(), elapsed_time, repeats).unwrap(); 
+             writeln!(result, "RESULT algo={}_{} method=predecessor size={} element_size={} time={} unit=ns test_values={} i={}",T::TYPE, name, size, std::mem::size_of::<E>(), elapsed_time, repeats, i).unwrap(); 
             result.flush().unwrap();
         }}
         {
@@ -146,7 +146,7 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
         
         println!("Datenstruktur erstellt");
 
-        for i in 0..SAMPLE_SIZE {
+        for i in 0..SAMPLE_PRED {
             cache_clear();
             let iter = test_values.iter();
             let now = Instant::now();
@@ -155,9 +155,9 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
             }
             let elapsed_time = now.elapsed().as_nanos();
             if i % 10 == 0 {
-                println!("Fortschritt: {}%",i*100/SAMPLE_SIZE);
+                println!("Fortschritt: {}%",i*100/SAMPLE_PRED);
             }
-            writeln!(result, "RESULT algo={}_{} method=successor size={} element_size={} time={} unit=ns repeats={}",T::TYPE, name, size, std::mem::size_of::<E>(), elapsed_time, repeats).unwrap(); 
+            writeln!(result, "RESULT algo={}_{} method=successor size={} element_size={} time={} unit=ns test_values={} i={}",T::TYPE, name, size, std::mem::size_of::<E>(), elapsed_time, repeats,i).unwrap(); 
             result.flush().unwrap();
         }}
 
