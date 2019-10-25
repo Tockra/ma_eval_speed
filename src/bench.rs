@@ -14,7 +14,7 @@ use criterion::black_box;
 
 use uint::{Typable};
 use ma_titan::default::immutable::{Int, STree};
-use super::{SAMPLE_PRED,REPEATS};
+use super::{SAMPLE_NEW, SAMPLE_PRED, REPEATS};
 
 const SEED: u128 = 0xcafef00dd15ea5e5;
 /// Diese Methode lädt die Testdaten aus ./testdata/{u40,u48,u64}/ und konstruiert mit Hilfe dieser eine
@@ -49,15 +49,17 @@ pub fn static_build_benchmark<E: Typable + From<u64> + Copy + Debug, T: Predeces
         let values = read_from_file::<E>(path.to_str().unwrap()).unwrap();
 
         let len = values.len();
-        let now = Instant::now();
-        
-        let result_ds = T::new(values.clone());
-        ::std::mem::size_of_val(&result_ds);
-        
-        let elapsed_time = now.elapsed().as_nanos();
-        writeln!(result, "RESULT algo={}_{} method=new size={} time={} unit=ns repeats={}",T::TYPE, name, len, elapsed_time, 1).unwrap(); 
-          
-        result.flush().unwrap();
+        for i in 0..SAMPLE_NEW {
+            let now = Instant::now();
+            
+            let result_ds = T::new(values.clone());
+            ::std::mem::size_of_val(&result_ds);
+            
+            let elapsed_time = now.elapsed().as_nanos();
+            writeln!(result, "RESULT algo={}_{} method=new size={} time={} unit=ns i={}",T::TYPE, name, len, elapsed_time, i).unwrap(); 
+            
+            result.flush().unwrap();
+        }
         
     }
     println!("Laufzeitmessung der Datenstrukturerzeugung beendet. Dauer {} Sekunden", bench_start.elapsed().as_secs())
