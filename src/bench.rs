@@ -19,18 +19,18 @@ use super::{SAMPLE_SIZE,REPEATS};
 const SEED: u128 = 0xcafef00dd15ea5e5;
 /// Diese Methode lädt die Testdaten aus ./testdata/{u40,u48,u64}/ und konstruiert mit Hilfe dieser eine
 /// Datenstruktur T. Dabei wird die Laufzeit gemessen.
-pub fn static_build_benchmark<E: Typable + From<u64> + Copy + Debug, T: PredecessorSetStatic<E>>(data: &str, name: &str) {
+pub fn static_build_benchmark<E: Typable + From<u64> + Copy + Debug, T: PredecessorSetStatic<E>>(data: &str, name: &str, var: u32) {
     println!("Starte Laufzeitmessung new(). Datenstruktur: {}, Datentyp {}, Datensatz: {}", E::TYPE, T::TYPE, data);
 
     let bench_start = Instant::now();
-    std::fs::create_dir_all("./output/new/").unwrap();
+    std::fs::create_dir_all(format!("./output/new/{}/",E::TYPE)).unwrap();
 
     let mut result = BufWriter::new(OpenOptions::new()
         .read(true)
         .write(true)
         .truncate(true)
         .create(true)
-        .open(format!("output/new/{}_{}_{}.txt",T::TYPE, name, data.replace("/", "_"))).unwrap());
+        .open(format!("output/new/{}/{}_{}_{}_{}.txt",E::TYPE, T::TYPE, name, data.replace("/", "_"), var)).unwrap());
     
     for dir in read_dir(format!("testdata/{}/{}/",data, E::TYPE)).unwrap() {
         let path = dir.unwrap().path();
@@ -40,7 +40,7 @@ pub fn static_build_benchmark<E: Typable + From<u64> + Copy + Debug, T: Predeces
         
         if data != "bwt_runs" {
             let i: u32 = path.to_str().unwrap().split('^').skip(1).next().unwrap().split('.').next().unwrap().parse().unwrap();
-            if i > 30 {
+            if i != var {
                 continue;
             }
         }
@@ -55,7 +55,7 @@ pub fn static_build_benchmark<E: Typable + From<u64> + Copy + Debug, T: Predeces
         ::std::mem::size_of_val(&result_ds);
         
         let elapsed_time = now.elapsed().as_nanos();
-        writeln!(result, "RESULT algo={}_{} method=new size={} time={} unit=ns repeats={}",T::TYPE, data, len, elapsed_time, 1).unwrap(); 
+        writeln!(result, "RESULT algo={}_{} method=new size={} time={} unit=ns repeats={}",T::TYPE, name, len, elapsed_time, 1).unwrap(); 
           
         result.flush().unwrap();
         
@@ -86,7 +86,7 @@ pub fn create_input<E: Typable + Add<E, Output=E> + Into<u64> + std::fmt::Displa
 /// Lädt die Testdaten aus ./testdata/{u40,u48,u64}/ und erzeugt mit Hilfe dieser die zu testende Datenstruktur T. 
 /// Anschließend werden 10000 gültige Vor- bzw. Nachfolger erzeugt und die Laufzeiten der Predecessor-Methode 
 /// werden mit Hilfe dieser gemessen
-pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64> + Into<u64>, T: Clone + PredecessorSetStatic<E>>(data: &str, name: &str) {
+pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64> + Into<u64>, T: Clone + PredecessorSetStatic<E>>(data: &str, name: &str, var: u32) {
     println!("Starte Laufzeitmessung pred(). Datenstruktur: {}, Datentyp {}, Datensatz: {}", E::TYPE, T::TYPE, data);
     let bench_start = Instant::now();
     std::fs::create_dir_all(format!("./output/pred/{}",E::TYPE)).unwrap();
@@ -95,7 +95,7 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
         .write(true)
         .truncate(true)
         .create(true)
-        .open(format!("output/pred/{}/{}_{}_{}.txt",E::TYPE,T::TYPE, name, data.replace("/", "_"))).unwrap());
+        .open(format!("output/pred/{}/{}_{}_{}_{}.txt",E::TYPE,T::TYPE, name, data.replace("/", "_"),var)).unwrap());
     for dir in read_dir(format!("testdata/{}/{}/",data, E::TYPE)).unwrap() {
         let path = dir.unwrap().path();
         if path.to_str().unwrap().contains("git") {
@@ -104,7 +104,7 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
 
         if data != "bwt_runs" {
             let i: u32 = path.to_str().unwrap().split('^').skip(1).next().unwrap().split('.').next().unwrap().parse().unwrap();
-            if i > 30 {
+            if i != var {
                 continue;
             }
         }
@@ -114,12 +114,8 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
         {
         let values = read_from_file::<E>(path.to_str().unwrap()).unwrap();
         let size = values.len();
-        println!("Test-Elemente eingelesen");
         let test_values = read_from_file::<E>(&format!("input/pred/{}/{}/min{}_max{}.data",data,E::TYPE,values[0].into(),values[size-1].into())).unwrap();
-        println!("Test-Values eingelesen");
         let repeats = test_values.len();
-
-        println!("Starte evaluierung pred()");
         let data_structure = T::new(values);
         
         println!("Datenstruktur erstellt");
@@ -134,7 +130,8 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
             if i % 10 == 0 {
                 println!("Fortschritt: {}%",i*100/SAMPLE_SIZE);
             }
-            writeln!(result, "RESULT algo={}_{} method=predecessor size={} element_size={} time={} unit=ns repeats={}",T::TYPE, data, size*std::mem::size_of::<E>(), std::mem::size_of::<E>(), elapsed_time, repeats).unwrap(); 
+             writeln!(result, "RESULT algo={}_{} method=predecessor size={} element_size={} time={} unit=ns repeats={}",T::TYPE, name, size, std::mem::size_of::<E>(), elapsed_time, repeats).unwrap(); 
+            result.flush().unwrap();
         }}
         {
         let values = read_from_file::<E>(path.to_str().unwrap()).unwrap();
@@ -160,9 +157,10 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
             if i % 10 == 0 {
                 println!("Fortschritt: {}%",i*100/SAMPLE_SIZE);
             }
-            writeln!(result, "RESULT algo={}_{} method=successor size={} element_size={} time={} unit=ns repeats={}",T::TYPE, data, size*std::mem::size_of::<E>(), std::mem::size_of::<E>(), elapsed_time, repeats).unwrap(); 
+            writeln!(result, "RESULT algo={}_{} method=successor size={} element_size={} time={} unit=ns repeats={}",T::TYPE, name, size, std::mem::size_of::<E>(), elapsed_time, repeats).unwrap(); 
+            result.flush().unwrap();
         }}
-        result.flush().unwrap();
+
     }
     println!("Laufzeitmessung der Predecessor- und Successor-Methoden beendet. Dauer {} Sekunden", bench_start.elapsed().as_secs())
 }
