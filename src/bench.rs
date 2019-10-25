@@ -43,6 +43,10 @@ pub fn static_build_benchmark<E: Typable + From<u64> + Copy + Debug, T: Predeces
             if i != var {
                 continue;
             }
+        } else {
+            if !path.to_str().unwrap().contains(var.to_string().as_str()) {
+                continue;
+            }
         }
         
         println!("{:?}",path);
@@ -107,6 +111,10 @@ pub fn pred_and_succ_benchmark<E: Typable + Into<u64> + Copy + Debug + From<u64>
         if data != "bwt_runs" {
             let i: u32 = path.to_str().unwrap().split('^').skip(1).next().unwrap().split('.').next().unwrap().parse().unwrap();
             if i != var {
+                continue;
+            }
+        } else {
+            if !path.to_str().unwrap().contains(var.to_string().as_str()) {
                 continue;
             }
         }
