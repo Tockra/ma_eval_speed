@@ -32,7 +32,7 @@ fn main() {
     }
 }
 
-fn stage1<T: Int + Typable + Display + Default + Add<T, Output=T> + From<u64> + Copy + Debug>(args: Vec<String>) {
+fn stage1<T: 'static + Int + Typable + Display + Default + Add<T, Output=T> + From<u64> + Copy + Debug>(args: Vec<String>) {
     match args[1].as_ref() {
         "stree" => stage2::<T,STree<T>>(args),
         "rbtree" => stage2::<T,RBTree<T>>(args),
