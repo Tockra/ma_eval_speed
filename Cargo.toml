@@ -13,4 +13,4 @@ num = "0.2.0"
 criterion = "0.3.0"
 uint = { git = "https://github.com/Tockra/uint.git" }
 treez = {git = "https://github.com/Tockra/treez"}
-ma_titan = { git = "https://github.com/Tockra/ma_titan.git", branch="space_efficient_u64_1" }
+ma_titan = { git = "https://github.com/Tockra/ma_titan.git", branch="brown_hash_u64_1" }
