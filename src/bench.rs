@@ -50,13 +50,14 @@ pub fn static_build_benchmark<E: Typable + From<u64> + Copy + Debug, T: Predeces
         }
         
         println!("{:?}",path);
-        let values = read_from_file::<E>(path.to_str().unwrap()).unwrap();
+        
 
-        let len = values.len();
+        
         for i in 0..SAMPLE_NEW {
+            let values = read_from_file::<E>(path.to_str().unwrap()).unwrap();
+            let len = values.len();
             let now = Instant::now();
-            
-            let result_ds = T::new(values.clone());
+            let result_ds = T::new(values);
             ::std::mem::size_of_val(&result_ds);
             
             let elapsed_time = now.elapsed().as_nanos();
