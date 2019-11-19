@@ -12,5 +12,5 @@ rand_pcg = "0.2.0"
 num = "0.2.0"
 criterion = "0.3.0"
 uint = { git = "https://github.com/Tockra/uint.git" }
-treez = {git = "https://github.com/Tockra/treez"}
+rbtree = {git = "https://github.com/Tockra/rbtree-rs"}
 ma_titan = { git = "https://github.com/Tockra/ma_titan.git" }

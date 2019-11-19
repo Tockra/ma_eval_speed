@@ -7,6 +7,7 @@ use std::ops::Add;
 use std::io::{BufWriter};
 use std::fs::read_dir;
 use std::collections::BTreeMap;
+use rbtree::RBTree;
 
 use rand_pcg::Mcg128Xsl64;
 use rand::Rng;
@@ -202,32 +203,28 @@ pub fn cache_clear() {
     buf.flush().unwrap();
 }
 
-#[derive(Clone)]
-pub struct RBTree<T> where T: Int + Default + num::Bounded {
-    rb: treez::rb::TreeRb<T,T>
-}
-
-impl<T: Int + Default + num::Bounded> PredecessorSetStatic<T> for RBTree<T> {
-    const TYPE: &'static str = "Rot-Schwarz-Baum";
-
+impl<T: Int>  PredecessorSetStatic<T> for RBTree<T,T> {
     fn new(elements: Box<[T]>) -> Self {
-        let mut rb = treez::rb::TreeRb::with_capacity(elements.len());
-        for &elem in elements.into_iter() {
-            rb.insert(elem,elem);
+        let mut n: RBTree<T,T> = RBTree::new();
+        for i in elements.iter() {
+            n.insert(*i,*i);
         }
-        rb.shrink_to_fit();
-        Self {
-            rb: rb,
-        }
+        n
     }
 
     fn predecessor(&self,number: T) -> Option<T> {
-        self.rb.predecessor(number).map(|x| *x)
+        Some(*self.predecessor(number).unwrap())
     }
 
-    fn successor(&self,number: T) -> Option<T> {
-        self.rb.successor(number).map(|x| *x)
+    fn successor(&self,number: T) -> Option<T>{
+        None
     }
+
+    /*fn contains(&self, number: T) -> bool {
+        self.contains_key(&number)
+    }*/
+
+    const TYPE: &'static str = "RBTree";
 }
 
 #[derive(Clone)]

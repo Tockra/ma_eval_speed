@@ -5,6 +5,7 @@ use uint::*;
 use std::collections::BTreeMap;
 use std::fmt::{Display, Debug};
 use std::ops::Add;
+use rbtree::RBTree;
 
 pub const SAMPLE_NEW: usize = 3;
 pub const SAMPLE_PRED: usize = 100;
@@ -35,7 +36,7 @@ fn main() {
 fn stage1<T: 'static + Int + Typable + Display + Default + Add<T, Output=T> + From<u64> + Copy + Debug>(args: Vec<String>) {
     match args[1].as_ref() {
         "stree" => stage2::<T,STree<T>>(args),
-        "rbtree" => stage2::<T,RBTree<T>>(args),
+        "rbtree" => stage2::<T,RBTree<T,T>>(args),
         "btree" => stage2::<T,BTreeMap<T,T>>(args),
 		"binary" => stage2::<T,BinarySearch<T>>(args),
         _ => println!("Bitte verwende {} <stree|rbtree|btree|binary> <pred|new|gen-input> <u40|u48|u64> <uniform|normal|bwt_runs> <input-size=<1,..,32> <name>",args[0]),
