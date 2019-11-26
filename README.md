@@ -1,6 +1,7 @@
 ## Verwendung
 Diese Bibliothek dient den Laufzeitmessungen der Datenstrukturen aus: https://github.com/Tockra/ma_titan (ma_titan) .
-Die Testdaten müssen zuvor mit: https://github.com/Tockra/ma_random_data_generator erzeugt werden und anschließend in ma_eval_speed/testdata gespeichert werden.
+Die Testdaten müssen zuvor mit: https://github.com/Tockra/ma_random_data_generator erzeugt werden und anschließend in ma_eval_speed/testdata gespeichert werden. Zusätzlich müssen
+die erzeugten Inputordner aus ma_random_data_generator/input auch nach ma_eval_speed/ verschoben werden.
 
 Dabei müssen alle Ordner (ma_eval_speed) entsprechend ihres Branch-Namens benannt werden. Außer: space_efficient* wird zu se* und hash_brown_hash* wird zu brown_hash* .
 
