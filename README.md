@@ -39,7 +39,7 @@ Ordnername von ma_eval_speed (siehe oben)
 - Zweierpotenz, die maximal überprüft wird (und alles zwischen Min und Max)
 
 **<Pfad zu ma_eval_speed>**
-/pfad/zu/ma_eval_speed (mit dem Namen der in Ordnername angegeben wurde)
+- /pfad/zu/ma_eval_speed (mit dem Namen der in Ordnername angegeben wurde)
 
 **<sbatch>**
 - entweder sbatch hinschreiben, dann werden slurm-jobs angelegt, sonst wird die Evaluierung der Reihe nach von 2^min bis 2^max ausgeführt.
