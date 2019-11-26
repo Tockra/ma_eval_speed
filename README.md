@@ -41,7 +41,7 @@ Ordnername von ma_eval_speed (siehe oben)
 **<Pfad zu ma_eval_speed>**
 - /pfad/zu/ma_eval_speed (mit dem Namen der in Ordnername angegeben wurde)
 
-**<sbatch>**
+**< sbatch >**
 - entweder sbatch hinschreiben, dann werden slurm-jobs angelegt, sonst wird die Evaluierung der Reihe nach von 2^min bis 2^max ausgeführt.
 - Verwendet wird bei Laufzeitevaluierung cquad01 
 
