@@ -17,8 +17,8 @@ Das File eval-scripts/speed/run-eval.sh kann wie folgt verwendet werden:
 - rbtree: Rot-Schwarz-Baum (bitte master-Branch verwenden)
 - binary: Binäre Suche (bitte master-Branch verwenden)
 
-**<Ordnername>**
-Ordnername von ma_eval_speed (siehe oben)
+**< Ordnername >**
+- Ordnername von ma_eval_speed (siehe oben)
 
 **<methode={new,pred}>**
 - new : Anlegen evaluieren
