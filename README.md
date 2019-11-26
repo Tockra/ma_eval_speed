@@ -1,3 +1,4 @@
+## Verwendung
 Diese Bibliothek dient den Laufzeitmessungen der Datenstrukturen aus: https://github.com/Tockra/ma_titan (ma_titan) .
 Die Testdaten müssen zuvor mit: https://github.com/Tockra/ma_random_data_generator erzeugt werden und anschließend in ma_eval_speed/testdata gespeichert werden.
 
@@ -6,39 +7,41 @@ Dabei müssen alle Ordner (ma_eval_speed) entsprechend ihres Branch-Namens benan
 
 
 Das File eval-scripts/speed/run-eval.sh kann wie folgt verwendet werden:
+```bash
 ./run_eval.sh <datenstruktur={stree, rbtree, binary}> <Ordnername> <methode={new,pred}> <verteilung={normal,uniform}> <datentyp={u40,u48,u64}> <min={1,2,3,4,..,32}> <max={1,2,3,4,..,32}> <Pfad zu ma_eval_speed> <sbatch> 
+```
 
-<datenstruktur={stree, rbtree, binary}>: 
+**<datenstruktur={stree, rbtree, binary}>:** 
 - stree: die stree-Implementierung, des entsprechenden branches von ma_eval_speed wird untersucht
 - rbtree: Rot-Schwarz-Baum (bitte master-Branch verwenden)
 - binary: Binäre Suche (bitte master-Branch verwenden)
 
-<Ordnername>
+**<Ordnername>**
 Ordnername von ma_eval_speed (siehe oben)
 
-<methode={new,pred}>
+**<methode={new,pred}>**
 - new : Anlegen evaluieren
 - pred : Vorgängeranfragen evaluieren
 
-<verteilung={normal,uniform}>
+**<verteilung={normal,uniform}>**
 - uniform: Gleichverteilung
 - normal: Normalverteilung
 
-<datentyp={u40,u48,u64}>
+**<datentyp={u40,u48,u64}>**
 - u40 : 40-Bit-Integer
 - u48 : 48-Bit-Integer
 - u64 : 64-Bit-Integer
 
-<min={1,2,3,4,..,32}>
+**<min={1,2,3,4,..,32}>**
 - Zweierpotenz, die mindestens überprüft wird (und alles zwischen Min und Max)
 
-<max={1,2,3,4,..,32}>
+**<max={1,2,3,4,..,32}>**
 - Zweierpotenz, die maximal überprüft wird (und alles zwischen Min und Max)
 
-<Pfad zu ma_eval_speed>
+**<Pfad zu ma_eval_speed>**
 /pfad/zu/ma_eval_speed (mit dem Namen der in Ordnername angegeben wurde)
 
-<sbatch>
+**<sbatch>**
 - entweder sbatch hinschreiben, dann werden slurm-jobs angelegt, sonst wird die Evaluierung der Reihe nach von 2^min bis 2^max ausgeführt.
 - Verwendet wird bei Laufzeitevaluierung cquad01 
 
